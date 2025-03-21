@@ -3,18 +3,20 @@ import Header from "./components/Header.vue";
 import SpecsTab from "./components/SpecsTab.vue";
 import CompareTab from "./components/CompareTab.vue";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Toaster } from "@/components/ui/toast";
 import { ref } from "vue";
 
 useHead({
   title: "PhoneSearchAI",
 });
 
-const activeTab = ref("specs");
+const activeTab = ref("compare");
 </script>
 
 <template>
   <div class="min-h-screen flex flex-col">
     <Header />
+    <Toaster />
     <main class="container max-w-screen-lg mx-auto pb-10 flex-1 flex flex-col">
       <div class="border border-gray-200 mt-10 rounded-lg flex-1 flex flex-col">
         <div class="p-4 flex flex-row items-center justify-between">
@@ -28,7 +30,7 @@ const activeTab = ref("specs");
             <Button variant="outline" class="text-sm"
               ><Icon name="tabler:plus"></Icon> New Chat</Button
             >
-            <Tabs v-model="activeTab" default-value="specs">
+            <Tabs v-model="activeTab">
               <TabsList class="justify-center">
                 <TabsTrigger value="specs" class="flex items-center">
                   <Icon

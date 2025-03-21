@@ -7,7 +7,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { ref, computed } from "vue";
+import { ref } from "vue";
 import { Motion } from "motion-v";
 
 const query = ref("");
@@ -74,7 +74,7 @@ const sendSpecsRequest = async () => {
     });
 
     const data = await response.json();
-    console.log("API Response:", data);
+    // console.log("API Response:", data);
     conversationHistory.value.push({
       type: "response",
       content: data,
