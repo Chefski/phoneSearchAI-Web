@@ -11,6 +11,26 @@ useHead({
 });
 
 const activeTab = ref("specs");
+
+const specsTabRef = ref(null);
+const compareTabRef = ref(null);
+
+const specsConversationHistory = ref([]);
+const specsIsFirstMessage = ref(true);
+const compareConversationHistory = ref([]);
+const compareIsFirstMessage = ref(true);
+
+const resetChat = () => {
+  if (activeTab.value === "specs" && specsTabRef.value) {
+    specsTabRef.value.resetChat();
+    specsConversationHistory.value = [];
+    specsIsFirstMessage.value = true;
+  } else if (activeTab.value === "compare" && compareTabRef.value) {
+    compareTabRef.value.resetChat();
+    compareConversationHistory.value = [];
+    compareIsFirstMessage.value = true;
+  }
+};
 </script>
 
 <template>
@@ -27,7 +47,7 @@ const activeTab = ref("specs");
             </h4>
           </div>
           <div class="flex gap-2">
-            <Button variant="outline" class="text-sm"
+            <Button variant="outline" class="text-sm" @click="resetChat"
               ><Icon name="tabler:plus"></Icon> New Chat</Button
             >
             <Tabs v-model="activeTab">
@@ -51,8 +71,22 @@ const activeTab = ref("specs");
           </div>
         </div>
         <div class="p-4 border-t border-gray-200 flex-1 flex flex-col">
-          <SpecsTab v-if="activeTab === 'specs'" />
-          <CompareTab v-else />
+          <SpecsTab 
+            v-if="activeTab === 'specs'" 
+            ref="specsTabRef"
+            :conversation-history="specsConversationHistory"
+            :is-first-message="specsIsFirstMessage"
+            @update:conversation-history="specsConversationHistory = $event"
+            @update:is-first-message="specsIsFirstMessage = $event"
+          />
+          <CompareTab 
+            v-else 
+            ref="compareTabRef"
+            :conversation-history="compareConversationHistory"
+            :is-first-message="compareIsFirstMessage"
+            @update:conversation-history="compareConversationHistory = $event"
+            @update:is-first-message="compareIsFirstMessage = $event"
+          />
         </div>
       </div>
     </main>

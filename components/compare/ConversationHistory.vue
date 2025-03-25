@@ -22,13 +22,15 @@ const props = defineProps({
         <!-- User query -->
         <div
           v-if="item.type === 'user'"
-          class="p-2.5 rounded-lg max-w-[70%] bg-primary text-primary-foreground ml-auto"
+          class="flex justify-end w-full"
         >
-          <p class="text-sm">{{ item.content }}</p>
+          <div class="p-2.5 rounded-lg inline-block max-w-[80%] bg-primary text-primary-foreground">
+            <p class="text-sm text-right">{{ item.content }}</p>
+          </div>
         </div>
 
         <!-- API Response -->
-        <div v-else-if="item.type === 'response'" class="bg-card rounded-lg">
+        <div v-else-if="item.type === 'response'" class="bg-card border rounded-lg p-4 shadow-lg">
           <h2 class="text-lg font-semibold mb-2">
             {{ item.content.phones.join(" vs ") }}
             <span class="text-sm font-normal text-muted-foreground">

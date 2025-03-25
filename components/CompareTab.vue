@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { ref, defineProps, defineEmits } from "vue";
 import { useToast } from "@/components/ui/toast/use-toast";
 import { useFocusToggle } from "@/composables/useFocusToggle";
 import WelcomeScreen from "@/components/compare/WelcomeScreen.vue";
@@ -7,6 +7,22 @@ import ConversationHistory from "@/components/compare/ConversationHistory.vue";
 import LoadingIndicator from "@/components/compare/LoadingIndicator.vue";
 import FocusOptions from "@/components/compare/FocusOptions.vue";
 import PhoneInputGrid from "@/components/compare/PhoneInputGrid.vue";
+
+const props = defineProps({
+  conversationHistory: {
+    type: Array,
+    required: true,
+  },
+  isFirstMessage: {
+    type: Boolean,
+    required: true,
+  },
+});
+
+const emit = defineEmits([
+  "update:conversationHistory",
+  "update:isFirstMessage",
+]);
 
 const { toast } = useToast();
 
@@ -16,8 +32,6 @@ const phonesToCompare = ref([
 ]);
 
 const isLoading = ref(false);
-const conversationHistory = ref([]);
-const isFirstMessage = ref(true);
 const currentMessageIndex = ref(0);
 const focusAccordionOpen = ref(null);
 
@@ -61,15 +75,19 @@ const sendCompareRequest = async () => {
     return;
   }
 
-  conversationHistory.value.push({
+  const userMessage = {
     type: "user",
     content: `Compare ${validPhones.join(
       " vs "
     )} focusing on ${getActiveFocus()}`,
-  });
+  };
 
-  if (isFirstMessage.value) {
-    isFirstMessage.value = false;
+  const updatedHistory = [...props.conversationHistory, userMessage];
+
+  emit("update:conversationHistory", updatedHistory);
+
+  if (props.isFirstMessage) {
+    emit("update:isFirstMessage", false);
   }
 
   startLoading();
@@ -87,18 +105,24 @@ const sendCompareRequest = async () => {
     });
 
     const data = await response.json();
-    // console.log("API Response:", data);
 
-    conversationHistory.value.push({
-      type: "response",
-      content: data,
-    });
+    emit("update:conversationHistory", [
+      ...updatedHistory,
+      {
+        type: "response",
+        content: data,
+      },
+    ]);
   } catch (error) {
     console.error("Error sending comparison request:", error);
-    conversationHistory.value.push({
-      type: "error",
-      content: "Sorry, there was an error processing your comparison request.",
-    });
+    emit("update:conversationHistory", [
+      ...updatedHistory,
+      {
+        type: "error",
+        content:
+          "Sorry, there was an error processing your comparison request.",
+      },
+    ]);
   } finally {
     stopLoading();
   }
@@ -111,18 +135,22 @@ const quickCompare = (phones) => {
   }));
   sendCompareRequest();
 };
+
+defineExpose({
+  resetChat: () => {
+    phonesToCompare.value = [
+      { id: 1, name: "" },
+      { id: 2, name: "" },
+    ];
+    stopLoading();
+  },
+});
 </script>
 
 <template>
-  <WelcomeScreen 
-    v-if="isFirstMessage"
-    @quick-compare="quickCompare"
-  />
+  <WelcomeScreen v-if="isFirstMessage" @quick-compare="quickCompare" />
 
-  <ConversationHistory 
-    v-else
-    :conversation-history="conversationHistory"
-  />
+  <ConversationHistory v-else :conversation-history="conversationHistory" />
 
   <div class="mt-auto mb-2">
     <LoadingIndicator
@@ -131,9 +159,7 @@ const quickCompare = (phones) => {
       :loading-messages="loadingMessages"
     />
 
-    <FocusOptions
-      v-model:accordion-open="focusAccordionOpen"
-    />
+    <FocusOptions v-model:accordion-open="focusAccordionOpen" />
 
     <PhoneInputGrid
       v-model:phones="phonesToCompare"

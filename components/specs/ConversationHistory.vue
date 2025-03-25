@@ -9,8 +9,8 @@ import {
 defineProps({
   conversationHistory: {
     type: Array,
-    required: true
-  }
+    required: true,
+  },
 });
 </script>
 
@@ -19,11 +19,10 @@ defineProps({
     <div class="space-y-6 px-4 mb-6">
       <template v-for="(item, index) in conversationHistory" :key="index">
         <!-- User query -->
-        <div
-          v-if="item.type === 'user'"
-          class="p-2.5 rounded-lg max-w-[30%] bg-primary text-primary-foreground ml-auto"
-        >
-          <p class="text-sm">{{ item.content }}</p>
+        <div v-if="item.type === 'user'" class="flex justify-end w-full">
+          <div class="p-2.5 rounded-lg inline-block max-w-[80%] bg-primary text-primary-foreground">
+            <p class="text-sm">{{ item.content }}</p>
+          </div>
         </div>
 
         <!-- API Response -->

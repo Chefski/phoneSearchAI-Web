@@ -1,24 +1,37 @@
 <script setup>
-import { ref } from "vue";
+import { ref, defineProps, defineEmits } from "vue";
 import WelcomeScreen from "@/components/specs/WelcomeScreen.vue";
 import ConversationHistory from "@/components/specs/ConversationHistory.vue";
 import LoadingIndicator from "@/components/specs/LoadingIndicator.vue";
 import MessageInput from "@/components/specs/MessageInput.vue";
 
-const conversationHistory = ref([]);
-const isFirstMessage = ref(true);
+const props = defineProps({
+  conversationHistory: {
+    type: Array,
+    required: true
+  },
+  isFirstMessage: {
+    type: Boolean,
+    required: true
+  }
+});
+
+const emit = defineEmits(['update:conversationHistory', 'update:isFirstMessage']);
+
 const isLoading = ref(false);
 
 const sendSpecsRequest = async (queryText) => {
   if (!queryText.trim()) return;
 
-  conversationHistory.value.push({
+  const updatedHistory = [...props.conversationHistory, {
     type: "user",
     content: queryText,
-  });
+  }];
 
-  if (isFirstMessage.value) {
-    isFirstMessage.value = false;
+  emit('update:conversationHistory', updatedHistory);
+
+  if (props.isFirstMessage) {
+    emit('update:isFirstMessage', false);
   }
 
   isLoading.value = true;
@@ -35,25 +48,31 @@ const sendSpecsRequest = async (queryText) => {
     });
 
     const data = await response.json();
-    conversationHistory.value.push({
+
+    emit('update:conversationHistory', [...updatedHistory, {
       type: "response",
       content: data,
-    });
+    }]);
   } catch (error) {
     console.error("Error sending request:", error);
-    conversationHistory.value.push({
+    emit('update:conversationHistory', [...updatedHistory, {
       type: "error",
       content: "Sorry, there was an error processing your request.",
-    });
+    }]);
   } finally {
     isLoading.value = false;
   }
 };
 
-// Handle example queries from welcome screen
 const handleExampleQuery = (query) => {
   sendSpecsRequest(query);
 };
+
+defineExpose({
+  resetChat: () => {
+    isLoading.value = false;
+  }
+});
 </script>
 
 <template>
