@@ -116,7 +116,7 @@ const sendSpecsRequest = async () => {
       <Button
         variant="outline"
         @click="
-          query = 'Xiaomi Redmi 15';
+          query = 'iPhone 16';
           sendSpecsRequest();
         "
         >iPhone 16</Button
@@ -133,8 +133,8 @@ const sendSpecsRequest = async () => {
   </div>
 
   <!-- Conversation history display after first message -->
-  <div v-else class="flex-1 overflow-y-auto mb-4">
-    <div class="space-y-6 px-4">
+  <div v-else class="flex-1 overflow-y-auto">
+    <div class="space-y-6 px-4 mb-6">
       <template v-for="(item, index) in conversationHistory" :key="index">
         <!-- User query -->
         <div
@@ -147,7 +147,7 @@ const sendSpecsRequest = async () => {
         <!-- API Response -->
         <div
           v-else-if="item.type === 'response'"
-          class="bg-card border rounded-lg p-4 shadow-sm"
+          class="bg-card border rounded-lg p-4 shadow-lg"
         >
           <h2 class="text-lg font-semibold mb-2">{{ item.content.query }}</h2>
 
