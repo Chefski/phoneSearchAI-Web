@@ -19,7 +19,7 @@ const props = defineProps({
 </script>
 
 <template>
-  <div class="h-6 overflow-hidden relative px-4">
+  <div class="h-6 overflow-hidden relative">
     <Motion
       v-if="isLoading"
       layout

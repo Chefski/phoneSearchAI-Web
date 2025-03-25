@@ -60,6 +60,7 @@ const stopLoading = () => {
 };
 
 const { getActiveFocus } = useFocusToggle();
+const sourcesCount = ref(4);
 
 const sendCompareRequest = async () => {
   const validPhones = phonesToCompare.value
@@ -101,6 +102,7 @@ const sendCompareRequest = async () => {
       body: JSON.stringify({
         focus: getActiveFocus(),
         phones: validPhones,
+        max_sources: sourcesCount.value,
       }),
     });
 
@@ -159,7 +161,10 @@ defineExpose({
       :loading-messages="loadingMessages"
     />
 
-    <FocusOptions v-model:accordion-open="focusAccordionOpen" />
+    <FocusOptions 
+      v-model:accordion-open="focusAccordionOpen" 
+      @update:sources-count="sourcesCount = $event"
+    />
 
     <PhoneInputGrid
       v-model:phones="phonesToCompare"

@@ -10,27 +10,29 @@ import { defineProps } from "vue";
 const props = defineProps({
   conversationHistory: {
     type: Array,
-    required: true
-  }
+    required: true,
+  },
 });
 </script>
 
 <template>
-  <div class="flex-1 overflow-y-auto mb-4">
-    <div class="space-y-6 px-4">
+  <div class="flex-1 overflow-y-auto">
+    <div class="space-y-6 px-4 mb-6">
       <template v-for="(item, index) in conversationHistory" :key="index">
         <!-- User query -->
-        <div
-          v-if="item.type === 'user'"
-          class="flex justify-end w-full"
-        >
-          <div class="p-2.5 rounded-lg inline-block max-w-[80%] bg-primary text-primary-foreground">
+        <div v-if="item.type === 'user'" class="flex justify-end w-full">
+          <div
+            class="p-2.5 rounded-lg inline-block max-w-[80%] bg-primary text-primary-foreground"
+          >
             <p class="text-sm text-right">{{ item.content }}</p>
           </div>
         </div>
 
         <!-- API Response -->
-        <div v-else-if="item.type === 'response'" class="bg-card border rounded-lg p-4 shadow-lg">
+        <div
+          v-else-if="item.type === 'response'"
+          class="bg-card border rounded-lg p-4 shadow-lg"
+        >
           <h2 class="text-lg font-semibold mb-2">
             {{ item.content.phones.join(" vs ") }}
             <span class="text-sm font-normal text-muted-foreground">
@@ -60,7 +62,7 @@ const props = defineProps({
               "
             ></div>
           </div>
-          <div class="mt-1 pt-3 border-border">
+          <div class="mt-1 pt-3">
             <Accordion type="single" collapsible>
               <AccordionItem value="sources">
                 <AccordionTrigger

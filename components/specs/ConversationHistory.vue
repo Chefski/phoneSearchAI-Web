@@ -54,7 +54,7 @@ defineProps({
             ></div>
           </div>
 
-          <div class="mt-4 pt-3 border-t border-border">
+          <div class="mt-4 pt-3 border-t">
             <Accordion type="single" collapsible>
               <AccordionItem value="sources">
                 <AccordionTrigger
