@@ -1,16 +1,6 @@
 <script setup>
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { ref } from "vue";
-import { Switch } from "@/components/ui/switch";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import { useToast } from "@/components/ui/toast/use-toast";
-import { Motion } from "motion-v";
 import { useFocusToggle } from "@/composables/useFocusToggle";
 import WelcomeScreen from "@/components/compare/WelcomeScreen.vue";
 import ConversationHistory from "@/components/compare/ConversationHistory.vue";
@@ -55,19 +45,7 @@ const stopLoading = () => {
   clearInterval(messageInterval);
 };
 
-const addPhoneInput = () => {
-  if (phonesToCompare.value.length >= 6) return;
-  const newId = phonesToCompare.value.length + 1;
-  phonesToCompare.value.push({ id: newId, name: "" });
-};
-
-const removePhone = (id) => {
-  phonesToCompare.value = phonesToCompare.value.filter(
-    (phone) => phone.id !== id
-  );
-};
-
-const { focusOptions, toggleFocus, getActiveFocus } = useFocusToggle();
+const { getActiveFocus } = useFocusToggle();
 
 const sendCompareRequest = async () => {
   const validPhones = phonesToCompare.value

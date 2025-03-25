@@ -10,7 +10,7 @@ useHead({
   title: "PhoneSearchAI",
 });
 
-const activeTab = ref("compare");
+const activeTab = ref("specs");
 </script>
 
 <template>
