@@ -1,14 +1,14 @@
 import { ref } from 'vue'
 
-export function useFocusToggle() {
-  const focusOptions = ref({
-    everything: true,
-    camera: false,
-    gaming: false,
-    display: false,
-    battery: false,
-  })
+const focusOptions = ref({
+  everything: true,
+  camera: false,
+  gaming: false,
+  display: false,
+  battery: false,
+})
 
+export function useFocusToggle() {
   const toggleFocus = (option) => {
     if (option === "everything") {
       if (focusOptions.value.everything) {

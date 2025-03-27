@@ -60,7 +60,7 @@ const stopLoading = () => {
 };
 
 const { getActiveFocus } = useFocusToggle();
-const sourcesCount = ref(4);
+const sourcesCount = ref(3);
 
 const sendCompareRequest = async () => {
   const validPhones = phonesToCompare.value
@@ -93,8 +93,22 @@ const sendCompareRequest = async () => {
 
   startLoading();
 
+  const responseObj = {
+    type: "response",
+    content: {
+      phones: validPhones,
+      focus: getActiveFocus(),
+      comparison: "",
+      sources: [],
+    },
+    isStreaming: true,
+  };
+
+  const historyWithResponse = [...updatedHistory, responseObj];
+  emit("update:conversationHistory", historyWithResponse);
+
   try {
-    const response = await fetch("http://0.0.0.0:8080/compare", {
+    const response = await fetch("http://0.0.0.0:8080/compare/stream", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -106,15 +120,79 @@ const sendCompareRequest = async () => {
       }),
     });
 
-    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
 
-    emit("update:conversationHistory", [
-      ...updatedHistory,
-      {
-        type: "response",
-        content: data,
-      },
-    ]);
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+
+    while (true) {
+      const { done, value } = await reader.read();
+
+      if (done) {
+        break;
+      }
+
+      buffer += decoder.decode(value, { stream: true });
+
+      let newlineIndex;
+      while ((newlineIndex = buffer.indexOf("\n")) >= 0) {
+        const line = buffer.slice(0, newlineIndex);
+        buffer = buffer.slice(newlineIndex + 1);
+
+        if (line.trim()) {
+          try {
+            const chunkData = JSON.parse(line);
+
+            // Update the response object with the latest data
+            responseObj.content.phones = chunkData.phones || validPhones;
+            responseObj.content.focus = chunkData.focus || getActiveFocus();
+            responseObj.content.comparison = chunkData.comparison || "";
+            responseObj.content.sources = chunkData.sources || [];
+
+            // If this is the final chunk, mark streaming as complete
+            if (chunkData.status === "complete") {
+              responseObj.isStreaming = false;
+            }
+
+            // Create a new array with the updated response object
+            const updatedHistoryWithResponse = [
+              ...updatedHistory,
+              { ...responseObj },
+            ];
+            emit("update:conversationHistory", updatedHistoryWithResponse);
+          } catch (e) {
+            console.error("Error parsing JSON chunk:", e, line);
+          }
+        }
+      }
+    }
+
+    // Process any remaining data in the buffer
+    if (buffer.trim()) {
+      try {
+        const chunkData = JSON.parse(buffer);
+        responseObj.content.phones = chunkData.phones || validPhones;
+        responseObj.content.focus = chunkData.focus || getActiveFocus();
+        responseObj.content.comparison = chunkData.comparison || "";
+        responseObj.content.sources = chunkData.sources || [];
+        responseObj.isStreaming = false;
+
+        const finalHistory = [...updatedHistory, { ...responseObj }];
+        emit("update:conversationHistory", finalHistory);
+      } catch (e) {
+        console.error("Error parsing final JSON chunk:", e, buffer);
+      }
+    }
+
+    // Ensure streaming is marked as complete
+    if (responseObj.isStreaming) {
+      responseObj.isStreaming = false;
+      const finalHistory = [...updatedHistory, { ...responseObj }];
+      emit("update:conversationHistory", finalHistory);
+    }
   } catch (error) {
     console.error("Error sending comparison request:", error);
     emit("update:conversationHistory", [
@@ -161,8 +239,8 @@ defineExpose({
       :loading-messages="loadingMessages"
     />
 
-    <FocusOptions 
-      v-model:accordion-open="focusAccordionOpen" 
+    <FocusOptions
+      v-model:accordion-open="focusAccordionOpen"
       @update:sources-count="sourcesCount = $event"
     />
 

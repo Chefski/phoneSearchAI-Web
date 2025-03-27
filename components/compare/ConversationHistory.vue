@@ -40,6 +40,18 @@ const props = defineProps({
             </span>
           </h2>
 
+          <div v-if="item.isStreaming" class="flex items-center gap-2 mb-2">
+            <div class="relative w-4 h-4">
+              <div
+                class="absolute inset-0 rounded-full bg-primary opacity-25 animate-ping"
+              ></div>
+              <div class="absolute inset-0 rounded-full bg-primary"></div>
+            </div>
+            <span class="text-xs font-medium text-muted-foreground"
+              >Generating response...</span
+            >
+          </div>
+
           <!-- Markdown formatting -->
           <div class="prose prose-sm max-w-none text-sm">
             <div
@@ -57,12 +69,54 @@ const props = defineProps({
                     /\+ (.*?)(?=\n|$)/g,
                     '<li class=\'ml-4 list-disc my-0.5\'>$1</li>'
                   )
+                  .replace(
+                    /(\|.*?\|\n\|.*?\|\n)((?:\|.*?\|\n)+)/g,
+                    (match, header, rows) => {
+                      const [headerRow, separator] = header.split('\n');
+                      const headers = headerRow
+                        .split('|')
+                        .slice(1, -1)
+                        .map(
+                          (h) =>
+                            `<th class='p-2 text-left bg-muted border-b'>${h.trim()}</th>`
+                        )
+                        .join('');
+
+                      const bodyRows = rows
+                        .split('\n')
+                        .map((row) => {
+                          const cells = row
+                            .split('|')
+                            .slice(1, -1)
+                            .map((c, index) => {
+                              const isVerdict =
+                                index === 0 &&
+                                c.trim().toLowerCase() === 'verdict';
+                              return `<td class='p-2 border-b ${
+                                isVerdict ? 'font-semibold bg-muted' : ''
+                              }'>${c.trim()}</td>`;
+                            })
+                            .join('');
+                          return `<tr>${cells}</tr>`;
+                        })
+                        .join('');
+
+                      return `
+                        <div class='overflow-x-auto'>
+                          <table class='table-auto w-full border-collapse'>
+                            <thead><tr>${headers}</tr></thead>
+                            <tbody>${bodyRows}</tbody>
+                          </table>
+                        </div>
+                      `;
+                    }
+                  )
                   .replace(/\n\n/g, '<br/>')
                   .replace(/\n/g, '')
               "
             ></div>
           </div>
-          <div class="mt-1 pt-3">
+          <div class="mt-1 pt-3" v-if="!item.isStreaming">
             <Accordion type="single" collapsible>
               <AccordionItem value="sources">
                 <AccordionTrigger

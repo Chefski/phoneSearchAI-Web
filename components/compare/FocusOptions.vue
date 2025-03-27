@@ -6,7 +6,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { ref, defineProps, defineEmits, watch } from "vue"; // Add watch
+import { ref, defineProps, defineEmits, watch } from "vue";
 import { useFocusToggle } from "@/composables/useFocusToggle";
 import {
   NumberField,
@@ -23,10 +23,10 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["update:accordionOpen", "update:sourcesCount"]); // Add the new emit
+const emit = defineEmits(["update:accordionOpen", "update:sourcesCount"]);
 
 const { focusOptions, toggleFocus, getActiveFocus } = useFocusToggle();
-const sourcesCount = ref(4);
+const sourcesCount = ref(3);
 
 watch(sourcesCount, (newValue) => {
   emit("update:sourcesCount", newValue);

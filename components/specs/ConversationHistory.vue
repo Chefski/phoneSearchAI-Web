@@ -32,6 +32,14 @@ defineProps({
         >
           <h2 class="text-lg font-semibold mb-2">{{ item.content.query }}</h2>
 
+          <div v-if="item.isStreaming" class="flex items-center gap-2 mb-2">
+            <div class="relative w-4 h-4">
+              <div class="absolute inset-0 rounded-full bg-primary opacity-25 animate-ping"></div>
+              <div class="absolute inset-0 rounded-full bg-primary"></div>
+            </div>
+            <span class="text-xs font-medium text-muted-foreground">Generating response...</span>
+          </div>
+
           <!-- Markdown formatting -->
           <div class="prose prose-sm max-w-none text-sm">
             <div
@@ -54,7 +62,7 @@ defineProps({
             ></div>
           </div>
 
-          <div class="mt-4 pt-3 border-t">
+          <div v-if="item.content.sources && item.content.sources.length > 0 && !item.isStreaming" class="mt-4 pt-3 border-t">
             <Accordion type="single" collapsible>
               <AccordionItem value="sources">
                 <AccordionTrigger

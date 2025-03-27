@@ -10,7 +10,8 @@ useHead({
   title: "PhoneSearchAI",
 });
 
-const activeTab = ref("specs");
+// Default tab
+const activeTab = ref("compare");
 
 const specsTabRef = ref(null);
 const compareTabRef = ref(null);
