@@ -5,11 +5,13 @@ PhoneSearchAI is a modern web application built with Nuxt.js that helps users se
 ## Features
 
 ### Phone Specifications Search
+
 - Search for detailed specifications of any smartphone model
 - Get comprehensive information about phone features
 - View sources for the information provided
 
 ### Phone Comparison
+
 - Compare up to multiple phone models side by side
 - Customize comparison focus areas:
   - Camera capabilities
@@ -20,6 +22,7 @@ PhoneSearchAI is a modern web application built with Nuxt.js that helps users se
 - Adjust the number of sources used for comparison
 
 ### User Interface
+
 - Clean, modern UI built with Tailwind CSS and Shadcn UI components
 - Responsive design that works on desktop and mobile devices
 - Intuitive tab-based navigation between specs and comparison modes
@@ -105,6 +108,7 @@ bun run preview
 ## Usage
 
 ### Specs Tab
+
 Use the Specs tab to search for detailed information about a specific phone model:
 
 1. Click on the "Specs" tab
@@ -112,6 +116,7 @@ Use the Specs tab to search for detailed information about a specific phone mode
 3. View the detailed specifications and sources
 
 ### Compare Tab
+
 Use the Compare tab to compare multiple phone models:
 
 1. Click on the "Compare" tab

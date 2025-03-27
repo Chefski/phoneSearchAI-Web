@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Motion } from "motion-v";
 import { defineEmits } from "vue";
 
-const emit = defineEmits(['quickCompare']);
+const emit = defineEmits(["quickCompare"]);
 
 const comparison1 = [
   {
@@ -71,7 +71,10 @@ const comparison3 = [
               ease: 'easeInOut',
             }"
           >
-            <Button variant="outline" @click="emit('quickCompare', comparison.phones)">
+            <Button
+              variant="outline"
+              @click="emit('quickCompare', comparison.phones)"
+            >
               {{ comparison.label }}
             </Button>
           </Motion>
@@ -88,7 +91,10 @@ const comparison3 = [
               ease: 'easeInOut',
             }"
           >
-            <Button variant="outline" @click="emit('quickCompare', comparison.phones)">
+            <Button
+              variant="outline"
+              @click="emit('quickCompare', comparison.phones)"
+            >
               {{ comparison.label }}
             </Button>
           </Motion>
@@ -104,7 +110,10 @@ const comparison3 = [
               ease: 'easeInOut',
             }"
           >
-            <Button variant="outline" @click="emit('quickCompare', comparison.phones)">
+            <Button
+              variant="outline"
+              @click="emit('quickCompare', comparison.phones)"
+            >
               {{ comparison.label }}
             </Button>
           </Motion>

@@ -21,19 +21,23 @@ let messageInterval;
 const startMessageRotation = () => {
   currentMessageIndex.value = 0;
   messageInterval = setInterval(() => {
-    currentMessageIndex.value = 
+    currentMessageIndex.value =
       (currentMessageIndex.value + 1) % loadingMessages.length;
   }, 4000);
 };
 
 // Watch for loading state changes
-watch(() => props.isLoading, (newValue) => {
-  if (newValue) {
-    startMessageRotation();
-  } else {
-    clearInterval(messageInterval);
-  }
-}, { immediate: true });
+watch(
+  () => props.isLoading,
+  (newValue) => {
+    if (newValue) {
+      startMessageRotation();
+    } else {
+      clearInterval(messageInterval);
+    }
+  },
+  { immediate: true },
+);
 
 // Clean up interval when component is destroyed
 onUnmounted(() => {

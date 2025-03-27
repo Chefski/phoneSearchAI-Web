@@ -1,5 +1,6 @@
 <script setup>
-import { ref, defineProps, defineEmits } from "vue";
+import { ref, defineProps, defineEmits, onMounted, onUnmounted } from "vue";
+import { Motion } from "motion-v";
 import { useToast } from "@/components/ui/toast/use-toast";
 import { useFocusToggle } from "@/composables/useFocusToggle";
 import WelcomeScreen from "@/components/compare/WelcomeScreen.vue";
@@ -34,6 +35,7 @@ const phonesToCompare = ref([
 const isLoading = ref(false);
 const currentMessageIndex = ref(0);
 const focusAccordionOpen = ref(null);
+const showScrollButton = ref(false);
 
 const loadingMessages = [
   "🔍 Searching for sources",
@@ -79,7 +81,7 @@ const sendCompareRequest = async () => {
   const userMessage = {
     type: "user",
     content: `Compare ${validPhones.join(
-      " vs "
+      " vs ",
     )} focusing on ${getActiveFocus()}`,
   };
 
@@ -225,6 +227,25 @@ defineExpose({
     stopLoading();
   },
 });
+
+const scrollToTop = () => {
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth",
+  });
+};
+
+const checkScrollPosition = () => {
+  showScrollButton.value = window.scrollY > 200;
+};
+
+onMounted(() => {
+  window.addEventListener("scroll", checkScrollPosition);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("scroll", checkScrollPosition);
+});
 </script>
 
 <template>
@@ -249,4 +270,20 @@ defineExpose({
       @compare="sendCompareRequest"
     />
   </div>
+
+  <Motion
+    v-if="showScrollButton"
+    :initial="{ opacity: 0 }"
+    :animate="{ opacity: 1 }"
+    :exit="{ opacity: 0 }"
+    :transition="{ duration: 0.4 }"
+  >
+    <button
+      @click="scrollToTop"
+      class="fixed bottom-6 right-6 bg-primary text-primary-foreground rounded-full w-12 h-12 flex items-center justify-center shadow-lg hover:bg-primary/90 z-50"
+      aria-label="Scroll to top"
+    >
+      <Icon name="tabler:chevron-up" class="w-6 h-6" />
+    </button>
+  </Motion>
 </template>

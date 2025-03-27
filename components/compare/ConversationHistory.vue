@@ -59,15 +59,15 @@ const props = defineProps({
                 item.content.comparison
                   .replace(
                     /\*\*(.*?)\*\*/g,
-                    '<h3 class=\'text-md font-semibold mt-3 mb-1\'>$1</h3>'
+                    '<h3 class=\'text-md font-semibold mt-3 mb-1\'>$1</h3>',
                   )
                   .replace(
                     /\* (.*?)(?=\n|$)/g,
-                    '<h4 class=\'text-sm font-medium mt-2 mb-0.5\'>$1</h4>'
+                    '<h4 class=\'text-sm font-medium mt-2 mb-0.5\'>$1</h4>',
                   )
                   .replace(
                     /\+ (.*?)(?=\n|$)/g,
-                    '<li class=\'ml-4 list-disc my-0.5\'>$1</li>'
+                    '<li class=\'ml-4 list-disc my-0.5\'>$1</li>',
                   )
                   .replace(
                     /(\|.*?\|\n\|.*?\|\n)((?:\|.*?\|\n)+)/g,
@@ -78,7 +78,7 @@ const props = defineProps({
                         .slice(1, -1)
                         .map(
                           (h) =>
-                            `<th class='p-2 text-left bg-muted border-b'>${h.trim()}</th>`
+                            `<th class='p-2 text-left bg-muted border-b'>${h.trim()}</th>`,
                         )
                         .join('');
 
@@ -109,7 +109,7 @@ const props = defineProps({
                           </table>
                         </div>
                       `;
-                    }
+                    },
                   )
                   .replace(/\n\n/g, '<br/>')
                   .replace(/\n/g, '')
@@ -128,13 +128,13 @@ const props = defineProps({
                       <template
                         v-for="(source, idx) in item.content.sources.slice(
                           0,
-                          3
+                          3,
                         )"
                         :key="idx"
                       >
                         <img
                           :src="`https://www.google.com/s2/favicons?domain=${encodeURIComponent(
-                            source.replace(/^https?:\/\//, '').split('/')[0]
+                            source.replace(/^https?:\/\//, '').split('/')[0],
                           )}&sz=16`"
                           :alt="source"
                           class="w-4 h-4 min-w-[16px] rounded-full border border-gray-200 border-background"
@@ -160,7 +160,7 @@ const props = defineProps({
                     >
                       <img
                         :src="`https://www.google.com/s2/favicons?domain=${encodeURIComponent(
-                          source.replace(/^https?:\/\//, '').split('/')[0]
+                          source.replace(/^https?:\/\//, '').split('/')[0],
                         )}&sz=16`"
                         :alt="source"
                         class="w-4 h-4 min-w-[16px]"

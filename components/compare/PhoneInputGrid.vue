@@ -6,22 +6,22 @@ import { ref, defineProps, defineEmits } from "vue";
 const props = defineProps({
   phones: {
     type: Array,
-    required: true
-  }
+    required: true,
+  },
 });
 
-const emit = defineEmits(['update:phones', 'compare']);
+const emit = defineEmits(["update:phones", "compare"]);
 
 const addPhoneInput = () => {
   if (props.phones.length >= 6) return;
   const newId = props.phones.length + 1;
   const updatedPhones = [...props.phones, { id: newId, name: "" }];
-  emit('update:phones', updatedPhones);
+  emit("update:phones", updatedPhones);
 };
 
 const removePhone = (id) => {
-  const updatedPhones = props.phones.filter(phone => phone.id !== id);
-  emit('update:phones', updatedPhones);
+  const updatedPhones = props.phones.filter((phone) => phone.id !== id);
+  emit("update:phones", updatedPhones);
 };
 </script>
 
@@ -64,7 +64,7 @@ const removePhone = (id) => {
         size="lg"
         @click="emit('compare')"
         :disabled="false"
-        class="w-full h-full min-h-[40px]"
+        class="w-full h-full"
       >
         <Icon name="material-symbols:compare-arrows" class="h-5 w-5 mr-2" />
         Compare Phones

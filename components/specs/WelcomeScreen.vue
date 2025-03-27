@@ -2,23 +2,19 @@
 import { Button } from "@/components/ui/button";
 import { Motion } from "motion-v";
 
-const emit = defineEmits(['example-query']);
+const emit = defineEmits(["example-query"]);
 
 const sendExampleQuery = (query) => {
-  emit('example-query', query);
+  emit("example-query", query);
 };
 
-const phoneList1 = [
-  "Samsung S25",
-  "iPhone 16",
-  "Google Pixel 9"
-];
+const phoneList1 = ["Samsung S25", "iPhone 16", "Google Pixel 9"];
 
 const phoneList2 = [
   "Xiaomi 15 Pro",
   "OnePlus 13",
   "Nothing Phone 3",
-  "Oppo A10"
+  "Oppo A10",
 ];
 </script>
 
@@ -42,10 +38,9 @@ const phoneList2 = [
               ease: 'easeInOut',
             }"
           >
-            <Button
-              variant="outline"
-              @click="sendExampleQuery(phone)"
-            >{{ phone }}</Button>
+            <Button variant="outline" @click="sendExampleQuery(phone)">{{
+              phone
+            }}</Button>
           </Motion>
         </template>
       </div>
@@ -59,10 +54,9 @@ const phoneList2 = [
               ease: 'easeInOut',
             }"
           >
-            <Button
-              variant="outline"
-              @click="sendExampleQuery(phone)"
-            >{{ phone }}</Button>
+            <Button variant="outline" @click="sendExampleQuery(phone)">{{
+              phone
+            }}</Button>
           </Motion>
         </template>
       </div>

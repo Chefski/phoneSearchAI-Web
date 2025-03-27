@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { ref } from "vue";
 
 const focusOptions = ref({
   everything: true,
@@ -6,7 +6,7 @@ const focusOptions = ref({
   gaming: false,
   display: false,
   battery: false,
-})
+});
 
 export function useFocusToggle() {
   const toggleFocus = (option) => {
@@ -19,7 +19,7 @@ export function useFocusToggle() {
         });
       } else {
         const anyOptionOn = Object.entries(focusOptions.value).some(
-          ([key, value]) => key !== "everything" && value === true
+          ([key, value]) => key !== "everything" && value === true,
         );
 
         if (!anyOptionOn) {
@@ -32,7 +32,7 @@ export function useFocusToggle() {
         focusOptions.value.everything = false;
       } else {
         const anyOptionOn = Object.entries(focusOptions.value).some(
-          ([key, value]) => key !== "everything" && value === true
+          ([key, value]) => key !== "everything" && value === true,
         );
 
         if (!anyOptionOn) {
@@ -40,7 +40,7 @@ export function useFocusToggle() {
         }
       }
     }
-  }
+  };
 
   const getActiveFocus = () => {
     const activeOptions = Object.entries(focusOptions.value)
@@ -55,11 +55,11 @@ export function useFocusToggle() {
     }
 
     return activeOptions.join(", ");
-  }
+  };
 
   return {
     focusOptions,
     toggleFocus,
     getActiveFocus,
-  }
+  };
 }

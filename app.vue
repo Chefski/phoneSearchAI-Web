@@ -72,16 +72,16 @@ const resetChat = () => {
           </div>
         </div>
         <div class="p-4 border-t border-gray-200 flex-1 flex flex-col">
-          <SpecsTab 
-            v-if="activeTab === 'specs'" 
+          <SpecsTab
+            v-if="activeTab === 'specs'"
             ref="specsTabRef"
             :conversation-history="specsConversationHistory"
             :is-first-message="specsIsFirstMessage"
             @update:conversation-history="specsConversationHistory = $event"
             @update:is-first-message="specsIsFirstMessage = $event"
           />
-          <CompareTab 
-            v-else 
+          <CompareTab
+            v-else
             ref="compareTabRef"
             :conversation-history="compareConversationHistory"
             :is-first-message="compareIsFirstMessage"

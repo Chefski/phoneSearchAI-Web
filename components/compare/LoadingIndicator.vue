@@ -5,16 +5,16 @@ import { defineProps } from "vue";
 const props = defineProps({
   isLoading: {
     type: Boolean,
-    default: false
+    default: false,
   },
   currentMessageIndex: {
     type: Number,
-    default: 0
+    default: 0,
   },
   loadingMessages: {
     type: Array,
-    required: true
-  }
+    required: true,
+  },
 });
 </script>
 

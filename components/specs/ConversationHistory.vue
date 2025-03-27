@@ -20,12 +20,15 @@ defineProps({
       <template v-for="(item, index) in conversationHistory" :key="index">
         <!-- User query -->
         <div v-if="item.type === 'user'" class="flex justify-end w-full">
-          <div class="p-2.5 rounded-lg inline-block max-w-[80%] bg-primary text-primary-foreground">
+          <div
+            class="p-2.5 rounded-lg inline-block max-w-[80%] bg-primary text-primary-foreground"
+          >
             <p class="text-sm">{{ item.content }}</p>
           </div>
         </div>
 
         <!-- API Response -->
+        <!-- shadow-[0_10px_15px_-3px_rgba(0,0,0,0.25),_inset_0_4px_8px_0px_rgba(0,0,0,0.15)] -->
         <div
           v-else-if="item.type === 'response'"
           class="bg-card border rounded-lg p-4 shadow-lg"
@@ -34,10 +37,14 @@ defineProps({
 
           <div v-if="item.isStreaming" class="flex items-center gap-2 mb-2">
             <div class="relative w-4 h-4">
-              <div class="absolute inset-0 rounded-full bg-primary opacity-25 animate-ping"></div>
+              <div
+                class="absolute inset-0 rounded-full bg-primary opacity-25 animate-ping"
+              ></div>
               <div class="absolute inset-0 rounded-full bg-primary"></div>
             </div>
-            <span class="text-xs font-medium text-muted-foreground">Generating response...</span>
+            <span class="text-xs font-medium text-muted-foreground"
+              >Generating response...</span
+            >
           </div>
 
           <!-- Markdown formatting -->
@@ -47,22 +54,29 @@ defineProps({
                 item.content.specifications
                   .replace(
                     /\*\*(.*?)\*\*/g,
-                    '<h3 class=\'text-md font-semibold mt-3 mb-1\'>$1</h3>'
+                    '<h3 class=\'text-md font-semibold mt-3 mb-1\'>$1</h3>',
                   )
                   .replace(
                     /\* (.*?)(?=\n|$)/g,
-                    '<h4 class=\'text-sm font-medium mt-2 mb-0.5\'>$1</h4>'
+                    '<h4 class=\'text-sm font-medium mt-2 mb-0.5\'>$1</h4>',
                   )
                   .replace(
                     /\+ (.*?)(?=\n|$)/g,
-                    '<li class=\'ml-4 list-disc my-0.5\'>$1</li>'
+                    '<li class=\'ml-4 list-disc my-0.5\'>$1</li>',
                   )
                   .replace(/\n/g, '')
               "
             ></div>
           </div>
 
-          <div v-if="item.content.sources && item.content.sources.length > 0 && !item.isStreaming" class="mt-4 pt-3 border-t">
+          <div
+            v-if="
+              item.content.sources &&
+              item.content.sources.length > 0 &&
+              !item.isStreaming
+            "
+            class="mt-4 pt-3 border-t"
+          >
             <Accordion type="single" collapsible>
               <AccordionItem value="sources">
                 <AccordionTrigger
@@ -74,13 +88,13 @@ defineProps({
                       <template
                         v-for="(source, idx) in item.content.sources.slice(
                           0,
-                          3
+                          3,
                         )"
                         :key="idx"
                       >
                         <img
                           :src="`https://www.google.com/s2/favicons?domain=${encodeURIComponent(
-                            source.replace(/^https?:\/\//, '').split('/')[0]
+                            source.replace(/^https?:\/\//, '').split('/')[0],
                           )}&sz=16`"
                           :alt="source"
                           class="w-4 h-4 min-w-[16px] rounded-full border border-gray-200 border-background"
@@ -106,7 +120,7 @@ defineProps({
                     >
                       <img
                         :src="`https://www.google.com/s2/favicons?domain=${encodeURIComponent(
-                          source.replace(/^https?:\/\//, '').split('/')[0]
+                          source.replace(/^https?:\/\//, '').split('/')[0],
                         )}&sz=16`"
                         :alt="source"
                         class="w-4 h-4 min-w-[16px]"

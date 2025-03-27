@@ -4,11 +4,11 @@ import { Input } from "@/components/ui/input";
 import { ref } from "vue";
 
 const query = ref("");
-const emit = defineEmits(['send-message']);
+const emit = defineEmits(["send-message"]);
 
 const sendMessage = () => {
   if (!query.value.trim()) return;
-  emit('send-message', query.value);
+  emit("send-message", query.value);
   query.value = "";
 };
 </script>
