@@ -1,8 +1,10 @@
 <script setup>
-import { ref, defineProps, defineEmits, onMounted, onUnmounted } from "vue";
+import { ref, defineProps, defineEmits, onMounted, onUnmounted, computed } from "vue";
 import { Motion } from "motion-v";
 import { useToast } from "@/components/ui/toast/use-toast";
 import { useFocusToggle } from "@/composables/useFocusToggle";
+import { usePhoneComparison } from "@/composables/usePhoneComparison";
+import { debounce } from "@/utils/debounce";
 import WelcomeScreen from "@/components/compare/WelcomeScreen.vue";
 import ConversationHistory from "@/components/compare/ConversationHistory.vue";
 import LoadingIndicator from "@/components/compare/LoadingIndicator.vue";
@@ -26,40 +28,15 @@ const emit = defineEmits([
 ]);
 
 const { toast } = useToast();
+const { isLoading, currentMessageIndex, loadingMessages, comparePhones, stopLoading } = usePhoneComparison();
 
 const phonesToCompare = ref([
   { id: 1, name: "" },
   { id: 2, name: "" },
 ]);
 
-const isLoading = ref(false);
-const currentMessageIndex = ref(0);
 const focusAccordionOpen = ref(null);
 const showScrollButton = ref(false);
-
-const loadingMessages = [
-  "🔍 Searching for sources",
-  "📱 Analyzing phone models",
-  "🤖 Processing your comparison request...",
-  "📊 Gathering detailed information...",
-  "🔄 Comparing specifications...",
-];
-
-let messageInterval;
-
-const startLoading = () => {
-  isLoading.value = true;
-  currentMessageIndex.value = 0;
-  messageInterval = setInterval(() => {
-    currentMessageIndex.value =
-      (currentMessageIndex.value + 1) % loadingMessages.length;
-  }, 4000);
-};
-
-const stopLoading = () => {
-  isLoading.value = false;
-  clearInterval(messageInterval);
-};
 
 const { getActiveFocus } = useFocusToggle();
 const sourcesCount = ref(3);
@@ -86,14 +63,11 @@ const sendCompareRequest = async () => {
   };
 
   const updatedHistory = [...props.conversationHistory, userMessage];
-
   emit("update:conversationHistory", updatedHistory);
 
   if (props.isFirstMessage) {
     emit("update:isFirstMessage", false);
   }
-
-  startLoading();
 
   const responseObj = {
     type: "response",
@@ -109,91 +83,34 @@ const sendCompareRequest = async () => {
   const historyWithResponse = [...updatedHistory, responseObj];
   emit("update:conversationHistory", historyWithResponse);
 
-  try {
-    const response = await fetch("http://0.0.0.0:8080/compare/stream", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        focus: getActiveFocus(),
-        phones: validPhones,
-        max_sources: sourcesCount.value,
-      }),
-    });
+  // Update callback for streaming response
+  const updateResponseCallback = (chunkData, isComplete) => {
+    responseObj.content.phones = chunkData.phones || validPhones;
+    responseObj.content.focus = chunkData.focus || getActiveFocus();
+    responseObj.content.comparison = chunkData.comparison || "";
+    responseObj.content.sources = chunkData.sources || [];
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder();
-    let buffer = "";
-
-    while (true) {
-      const { done, value } = await reader.read();
-
-      if (done) {
-        break;
-      }
-
-      buffer += decoder.decode(value, { stream: true });
-
-      let newlineIndex;
-      while ((newlineIndex = buffer.indexOf("\n")) >= 0) {
-        const line = buffer.slice(0, newlineIndex);
-        buffer = buffer.slice(newlineIndex + 1);
-
-        if (line.trim()) {
-          try {
-            const chunkData = JSON.parse(line);
-
-            // Update the response object with the latest data
-            responseObj.content.phones = chunkData.phones || validPhones;
-            responseObj.content.focus = chunkData.focus || getActiveFocus();
-            responseObj.content.comparison = chunkData.comparison || "";
-            responseObj.content.sources = chunkData.sources || [];
-
-            // If this is the final chunk, mark streaming as complete
-            if (chunkData.status === "complete") {
-              responseObj.isStreaming = false;
-            }
-
-            // Create a new array with the updated response object
-            const updatedHistoryWithResponse = [
-              ...updatedHistory,
-              { ...responseObj },
-            ];
-            emit("update:conversationHistory", updatedHistoryWithResponse);
-          } catch (e) {
-            console.error("Error parsing JSON chunk:", e, line);
-          }
-        }
-      }
-    }
-
-    // Process any remaining data in the buffer
-    if (buffer.trim()) {
-      try {
-        const chunkData = JSON.parse(buffer);
-        responseObj.content.phones = chunkData.phones || validPhones;
-        responseObj.content.focus = chunkData.focus || getActiveFocus();
-        responseObj.content.comparison = chunkData.comparison || "";
-        responseObj.content.sources = chunkData.sources || [];
-        responseObj.isStreaming = false;
-
-        const finalHistory = [...updatedHistory, { ...responseObj }];
-        emit("update:conversationHistory", finalHistory);
-      } catch (e) {
-        console.error("Error parsing final JSON chunk:", e, buffer);
-      }
-    }
-
-    // Ensure streaming is marked as complete
-    if (responseObj.isStreaming) {
+    if (isComplete || chunkData.status === "complete") {
       responseObj.isStreaming = false;
-      const finalHistory = [...updatedHistory, { ...responseObj }];
-      emit("update:conversationHistory", finalHistory);
+    }
+
+    const updatedHistoryWithResponse = [
+      ...updatedHistory,
+      { ...responseObj },
+    ];
+    emit("update:conversationHistory", updatedHistoryWithResponse);
+  };
+
+  try {
+    const result = await comparePhones(
+      validPhones,
+      getActiveFocus(),
+      sourcesCount.value,
+      updateResponseCallback
+    );
+
+    if (!result.success) {
+      throw result.error || new Error("Failed to compare phones");
     }
   } catch (error) {
     console.error("Error sending comparison request:", error);
@@ -205,8 +122,6 @@ const sendCompareRequest = async () => {
           "Sorry, there was an error processing your comparison request.",
       },
     ]);
-  } finally {
-    stopLoading();
   }
 };
 
@@ -217,6 +132,11 @@ const quickCompare = (phones) => {
   }));
   sendCompareRequest();
 };
+
+const hasEnoughPhones = computed(() => {
+  const validPhones = phonesToCompare.value.filter(phone => phone.name.trim() !== "");
+  return validPhones.length >= 2;
+});
 
 defineExpose({
   resetChat: () => {
@@ -235,9 +155,9 @@ const scrollToTop = () => {
   });
 };
 
-const checkScrollPosition = () => {
+const checkScrollPosition = debounce(() => {
   showScrollButton.value = window.scrollY > 200;
-};
+}, 100);
 
 onMounted(() => {
   window.addEventListener("scroll", checkScrollPosition);
@@ -245,6 +165,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   window.removeEventListener("scroll", checkScrollPosition);
+  stopLoading();
 });
 </script>
 
@@ -267,6 +188,7 @@ onUnmounted(() => {
 
     <PhoneInputGrid
       v-model:phones="phonesToCompare"
+      :has-enough-phones="hasEnoughPhones"
       @compare="sendCompareRequest"
     />
   </div>

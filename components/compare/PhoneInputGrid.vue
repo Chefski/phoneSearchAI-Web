@@ -2,15 +2,24 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ref, defineProps, defineEmits } from "vue";
+import { debounce } from "@/utils/debounce";
 
 const props = defineProps({
   phones: {
     type: Array,
     required: true,
   },
+  hasEnoughPhones: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const emit = defineEmits(["update:phones", "compare"]);
+
+const updatePhones = debounce((phones) => {
+  emit("update:phones", phones);
+}, 300);
 
 const addPhoneInput = () => {
   if (props.phones.length >= 6) return;
@@ -35,7 +44,7 @@ const removePhone = (id) => {
             type="text"
             :placeholder="`Phone ${phone.id}`"
             class="pr-10"
-            @input="emit('update:phones', phones)"
+            @input="updatePhones(phones)"
           />
           <Button
             v-if="phones.length > 2"
@@ -63,7 +72,7 @@ const removePhone = (id) => {
         variant="default"
         size="lg"
         @click="emit('compare')"
-        :disabled="false"
+        :disabled="!hasEnoughPhones"
         class="w-full h-full"
       >
         <Icon name="material-symbols:compare-arrows" class="h-5 w-5 mr-2" />
