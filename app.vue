@@ -11,7 +11,7 @@ useHead({
 });
 
 // Default tab
-const activeTab = ref("compare");
+const activeTab = ref("specs");
 
 const specsTabRef = ref(null);
 const compareTabRef = ref(null);

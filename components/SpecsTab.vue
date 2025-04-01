@@ -156,6 +156,15 @@ const handleExampleQuery = (query) => {
   sendSpecsRequest(query);
 };
 
+const handleRetry = (query) => {
+  const updatedHistory = props.conversationHistory.filter(item => 
+    !(item.type === 'response' && item.content.query === query));
+  
+  emit("update:conversationHistory", updatedHistory);
+  
+  sendSpecsRequest(query);
+};
+
 defineExpose({
   resetChat: () => {
     isLoading.value = false;
@@ -185,7 +194,7 @@ onUnmounted(() => {
 <template>
   <WelcomeScreen v-if="isFirstMessage" @example-query="handleExampleQuery" />
 
-  <ConversationHistory v-else :conversationHistory="conversationHistory" />
+  <ConversationHistory v-else :conversationHistory="conversationHistory" @retry="handleRetry" />
 
   <div class="mt-auto mb-2 px-4">
     <LoadingIndicator :isLoading="isLoading" />

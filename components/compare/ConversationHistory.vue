@@ -7,6 +7,8 @@ import {
 } from "@/components/ui/accordion";
 import { defineProps } from "vue";
 
+const emit = defineEmits(['retry']);
+
 const props = defineProps({
   conversationHistory: {
     type: Array,
@@ -59,15 +61,15 @@ const props = defineProps({
                 item.content.comparison
                   .replace(
                     /\*\*(.*?)\*\*/g,
-                    '<h3 class=\'text-md font-semibold mt-3 mb-1\'>$1</h3>',
+                    '<h3 class=\'text-md font-semibold mt-3 mb-1\'>$1</h3>'
                   )
                   .replace(
                     /\* (.*?)(?=\n|$)/g,
-                    '<h4 class=\'text-sm font-medium mt-2 mb-0.5\'>$1</h4>',
+                    '<h4 class=\'text-sm font-medium mt-2 mb-0.5\'>$1</h4>'
                   )
                   .replace(
                     /\+ (.*?)(?=\n|$)/g,
-                    '<li class=\'ml-4 list-disc my-0.5\'>$1</li>',
+                    '<li class=\'ml-4 list-disc my-0.5\'>$1</li>'
                   )
                   .replace(
                     /(\|.*?\|\n\|.*?\|\n)((?:\|.*?\|\n)+)/g,
@@ -78,7 +80,7 @@ const props = defineProps({
                         .slice(1, -1)
                         .map(
                           (h) =>
-                            `<th class='p-2 text-left bg-muted border-b'>${h.trim()}</th>`,
+                            `<th class='p-2 text-left bg-muted border-b'>${h.trim()}</th>`
                         )
                         .join('');
 
@@ -109,14 +111,21 @@ const props = defineProps({
                           </table>
                         </div>
                       `;
-                    },
+                    }
                   )
                   .replace(/\n\n/g, '<br/>')
                   .replace(/\n/g, '')
               "
             ></div>
           </div>
-          <div class="mt-1 pt-3" v-if="!item.isStreaming">
+          <div
+            class="mt-1 pt-3"
+            v-if="
+              item.content.sources &&
+              item.content.sources.length > 0 &&
+              !item.isStreaming
+            "
+          >
             <Accordion type="single" collapsible>
               <AccordionItem value="sources">
                 <AccordionTrigger
@@ -128,13 +137,13 @@ const props = defineProps({
                       <template
                         v-for="(source, idx) in item.content.sources.slice(
                           0,
-                          3,
+                          3
                         )"
                         :key="idx"
                       >
                         <img
                           :src="`https://www.google.com/s2/favicons?domain=${encodeURIComponent(
-                            source.replace(/^https?:\/\//, '').split('/')[0],
+                            source.replace(/^https?:\/\//, '').split('/')[0]
                           )}&sz=16`"
                           :alt="source"
                           class="w-4 h-4 min-w-[16px] rounded-full border border-gray-200 border-background"
@@ -160,7 +169,7 @@ const props = defineProps({
                     >
                       <img
                         :src="`https://www.google.com/s2/favicons?domain=${encodeURIComponent(
-                          source.replace(/^https?:\/\//, '').split('/')[0],
+                          source.replace(/^https?:\/\//, '').split('/')[0]
                         )}&sz=16`"
                         :alt="source"
                         class="w-4 h-4 min-w-[16px]"
@@ -180,6 +189,15 @@ const props = defineProps({
               </AccordionItem>
             </Accordion>
           </div>
+          <button
+            v-if="!item.isStreaming"
+            @click="emit('retry', item.content.phones.join(' vs '))"
+            class="mt-4 p-2 hover:bg-muted rounded-md transition-colors flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+            title="Retry query"
+          >
+            <Icon name="tabler:repeat" class="w-5 h-5" />
+            Retry
+          </button>
         </div>
         <div
           v-else-if="item.type === 'error'"

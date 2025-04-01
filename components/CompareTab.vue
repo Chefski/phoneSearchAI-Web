@@ -133,6 +133,21 @@ const quickCompare = (phones) => {
   sendCompareRequest();
 };
 
+const handleRetry = (query) => {
+  const phones = query.split(' vs ').map(name => name.trim());
+  phonesToCompare.value = phones.map((name, index) => ({
+    id: index + 1,
+    name,
+  }));
+  
+  const updatedHistory = props.conversationHistory.filter(item => 
+    !(item.type === 'response' && item.content.phones.join(' vs ') === query));
+  
+  emit("update:conversationHistory", updatedHistory);
+  
+  sendCompareRequest();
+};
+
 const hasEnoughPhones = computed(() => {
   const validPhones = phonesToCompare.value.filter(phone => phone.name.trim() !== "");
   return validPhones.length >= 2;
@@ -172,7 +187,7 @@ onUnmounted(() => {
 <template>
   <WelcomeScreen v-if="isFirstMessage" @quick-compare="quickCompare" />
 
-  <ConversationHistory v-else :conversation-history="conversationHistory" />
+  <ConversationHistory v-else :conversation-history="conversationHistory" @retry="handleRetry" />
 
   <div class="mt-auto mb-2">
     <LoadingIndicator

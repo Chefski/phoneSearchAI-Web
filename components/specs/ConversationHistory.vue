@@ -12,6 +12,8 @@ defineProps({
     required: true,
   },
 });
+
+const emit = defineEmits(['retry']);
 </script>
 
 <template>
@@ -54,15 +56,15 @@ defineProps({
                 item.content.specifications
                   .replace(
                     /\*\*(.*?)\*\*/g,
-                    '<h3 class=\'text-md font-semibold mt-3 mb-1\'>$1</h3>',
+                    '<h3 class=\'text-md font-semibold mt-3 mb-1\'>$1</h3>'
                   )
                   .replace(
                     /\* (.*?)(?=\n|$)/g,
-                    '<h4 class=\'text-sm font-medium mt-2 mb-0.5\'>$1</h4>',
+                    '<h4 class=\'text-sm font-medium mt-2 mb-0.5\'>$1</h4>'
                   )
                   .replace(
                     /\+ (.*?)(?=\n|$)/g,
-                    '<li class=\'ml-4 list-disc my-0.5\'>$1</li>',
+                    '<li class=\'ml-4 list-disc my-0.5\'>$1</li>'
                   )
                   .replace(/\n/g, '')
               "
@@ -88,13 +90,13 @@ defineProps({
                       <template
                         v-for="(source, idx) in item.content.sources.slice(
                           0,
-                          3,
+                          3
                         )"
                         :key="idx"
                       >
                         <img
                           :src="`https://www.google.com/s2/favicons?domain=${encodeURIComponent(
-                            source.replace(/^https?:\/\//, '').split('/')[0],
+                            source.replace(/^https?:\/\//, '').split('/')[0]
                           )}&sz=16`"
                           :alt="source"
                           class="w-4 h-4 min-w-[16px] rounded-full border border-gray-200 border-background"
@@ -120,7 +122,7 @@ defineProps({
                     >
                       <img
                         :src="`https://www.google.com/s2/favicons?domain=${encodeURIComponent(
-                          source.replace(/^https?:\/\//, '').split('/')[0],
+                          source.replace(/^https?:\/\//, '').split('/')[0]
                         )}&sz=16`"
                         :alt="source"
                         class="w-4 h-4 min-w-[16px]"
@@ -140,8 +142,16 @@ defineProps({
               </AccordionItem>
             </Accordion>
           </div>
+          <button
+            v-if="!item.isStreaming"
+            @click="emit('retry', item.content.query)"
+            class="mt-4 p-2 hover:bg-muted rounded-md transition-colors flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+            title="Retry query"
+          >
+            <Icon name="tabler:repeat" class="w-5 h-5" />
+            Retry
+          </button>
         </div>
-
         <div
           v-else-if="item.type === 'error'"
           class="p-2.5 rounded-lg max-w-[70%] bg-destructive text-destructive-foreground"
